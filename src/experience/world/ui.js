@@ -57,7 +57,7 @@ export default class UI {
         // Mobile: overlay in center strip captures touch – swipe up/down changes room (sidebar + room-desc stay clickable)
         const isTouchDevice = () => 'ontouchstart' in window || navigator.maxTouchPoints > 0;
         if (isTouchDevice()) {
-            const TOUCH_THRESHOLD = 50;
+            const TOUCH_THRESHOLD = 10;
             let touchStartY = 0;
             let touchActive = false;
 
