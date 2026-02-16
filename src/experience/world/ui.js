@@ -11,7 +11,7 @@ export default class UI {
         this.controls = this.experience.camera.controls;
         this.cone = this.experience.world.cone.mesh;
         this.resources = this.experience.resources;
-        this.currentViewId = 1;
+        this.currentViewId = 4;
         this.scrollCooldown = false;
 
         this.event = {
@@ -126,7 +126,7 @@ export default class UI {
 
     switchViewListener() {
         this.resources.on('switch.view', () => {
-            this.switchView(1);
+            this.switchView(4);
         })
     }
 

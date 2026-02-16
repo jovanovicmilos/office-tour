@@ -22,12 +22,14 @@ export default class Camera {
         }
 
         this.instance = new THREE.PerspectiveCamera(this.fov, this.sizes.width / this.sizes.height, 0.1, 1000)
-        this.instance.position.set(4.7, 3.6, 0.9)
+        // Initial position = bird's-eye view (same as views.js viewId 4)
+        this.instance.position.set(25.2, 38, 36.1)
         this.scene.add(this.instance)
     }
 
     setControls() {
         this.controls = new OrbitControls(this.instance, this.canvas)
+        // Target = bird's-eye view (same as views.js viewId 4)
         this.controls.target.set(4.87, 2.9, -3.21);
         this.controls.enableDamping = true;
         this.controls.maxPolarAngle = Math.PI / 2;
