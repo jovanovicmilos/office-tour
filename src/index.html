@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optimal Systems | a Kyocera Group Company | Belgrade Office Tour</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css">
+    <script src="https://kit.fontawesome.com/85eca5559e.js" crossorigin="anonymous" defer></script>
+</head>
+<body>
+    <canvas class="webgl"></canvas>
+
+    <div id="loading-bar" class="loading-bar">
+        <h1>BELGRADE OFFICE TOUR</h1>
+        <div class="loading-bar__progress">
+            <div id="loading-progress-fill" class="loading-bar__progress-fill"></div>
+        </div>
+    </div>
+
+    <div class="angle">
+        <div class="angles__angle angles__angle--left-top"></div>
+        <div class="angles__angle angles__angle--right-top"></div>
+        <div class="angles__angle angles__angle--left-bottom"></div>
+        <div class="angles__angle angles__angle--right-bottom"></div>
+    </div>
+
+    <div class="lines">
+        <div class="lines__line--left"></div>
+        <div class="lines__line--middle"></div>
+    </div>
+
+    <div class="scroll-hint" id="scroll-hint">
+        <span>Scroll to explore rooms</span>
+    </div>
+    <div class="room-desc">
+        <article class="room-desc__box">
+            <h3 class="room-desc__title"></h3>
+            <p class="room-desc__text"></p>
+        </article>
+    </div>
+
+    <nav class="navigation sidebar">
+        <div class="sidebar__content">
+            <div class="sidebar__view-indicator" id="menu-view-indicator">
+                <div class="sidebar__view-indicator-ring"></div>
+            </div>
+            <div class="sidebar__items">
+                <button class="sidebar__item" data-view="4">BIRD'S-EYE VIEW</button>
+                <button class="sidebar__item" data-view="1">REST ROOM</button>
+                <button class="sidebar__item" data-view="11">KOOKABURRA</button>
+                <button class="sidebar__item" data-view="2">QA DEPARTMENT</button>
+                <button class="sidebar__item" data-view="12">GUEST'S OFFICE</button>
+                <button class="sidebar__item" data-view="3">SPARROW OFFICE</button>
+                <button class="sidebar__item" data-view="9">KITCHEN</button>
+                <button class="sidebar__item" data-view="10">CONFERENCE</button>
+                <button class="sidebar__item" data-view="6">OFFICE MANAGER</button>
+                <button class="sidebar__item" data-view="5">DIRECTOR</button>
+                <button class="sidebar__item" data-view="7">PO'S OFFICE</button>
+                <button class="sidebar__item" data-view="8">AI OFFICE</button>
+            </div>
+            <div class="sidebar__zoom">
+                <button class="sidebar__zoom-btn" onclick="window.experience?.world?.ui?.event?.zoom(false)" aria-label="Zoom in">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+                <button class="sidebar__zoom-btn" onclick="window.experience?.world?.ui?.event?.zoom(true)" aria-label="Zoom out">
+                    <i class="fa-solid fa-minus"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <script type="module" src="./script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const switchToView = (viewId) => {
+                window.experience?.world?.ui?.event?.switchView(viewId);
+            };
+            document.querySelectorAll('.sidebar__item').forEach(btn => {
+                btn.addEventListener('click', () => switchToView(parseInt(btn.dataset.view, 10)));
+            });
+        });
+    </script>
+</body>
+</html>
