@@ -54,41 +54,42 @@ export default class UI {
         };
         window.addEventListener('wheel', handleWheel, { passive: false });
 
-        // Mobile: one-finger swipe in bottom "scroll zone" = change room (rest of screen = camera)
-        const SCROLL_ZONE_HEIGHT = 72;
-        const TOUCH_THRESHOLD = 35;
-        let scrollZoneStartY = 0;
-        let scrollZoneActive = false;
+        // Mobile: one-finger vertical swipe anywhere = change room (capture phase so we run before canvas)
+        const TOUCH_THRESHOLD = 40;
+        let touchStartY = 0;
+        let touchLastY = 0;
+        let touchActive = false;
 
-        const isInScrollZone = (clientY) => {
-            return typeof window !== 'undefined' && clientY >= window.innerHeight - SCROLL_ZONE_HEIGHT;
+        const isTouchOnUI = (target) => {
+            return target && (target.closest('.sidebar') || target.closest('.room-desc'));
         };
 
         const handleTouchStart = (e) => {
-            if (e.touches.length === 1 && isInScrollZone(e.touches[0].clientY)) {
-                scrollZoneActive = true;
-                scrollZoneStartY = e.touches[0].clientY;
-            }
+            if (e.touches.length !== 1 || isTouchOnUI(e.target)) return;
+            touchActive = true;
+            touchStartY = touchLastY = e.touches[0].clientY;
         };
         const handleTouchMove = (e) => {
-            if (scrollZoneActive && e.touches.length === 1) {
-                e.preventDefault();
-            }
+            if (!touchActive || e.touches.length !== 1) return;
+            e.preventDefault();
+            touchLastY = e.touches[0].clientY;
         };
         const handleTouchEnd = (e) => {
-            if (scrollZoneActive && e.changedTouches && e.changedTouches[0]) {
-                const endY = e.changedTouches[0].clientY;
-                const delta = scrollZoneStartY - endY;
-                if (Math.abs(delta) >= TOUCH_THRESHOLD) {
-                    applyScroll(delta > 0 ? 1 : -1);
-                }
-                scrollZoneActive = false;
+            if (!touchActive) return;
+            touchActive = false;
+            const touch = e.changedTouches && e.changedTouches[0];
+            if (!touch) return;
+            const endY = touch.clientY;
+            const delta = touchStartY - endY;
+            if (Math.abs(delta) >= TOUCH_THRESHOLD) {
+                applyScroll(delta > 0 ? 1 : -1);
             }
         };
 
-        window.addEventListener('touchstart', handleTouchStart, { passive: true });
-        window.addEventListener('touchmove', handleTouchMove, { passive: false });
-        window.addEventListener('touchend', handleTouchEnd, { passive: true });
+        const capture = true;
+        document.addEventListener('touchstart', handleTouchStart, { passive: true, capture });
+        document.addEventListener('touchmove', handleTouchMove, { passive: false, capture });
+        document.addEventListener('touchend', handleTouchEnd, { passive: true, capture });
     }
 
     /**
