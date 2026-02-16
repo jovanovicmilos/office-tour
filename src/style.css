@@ -368,6 +368,10 @@ body {
 }
 
 @media (max-width: 768px) {
+   .scroll-hint {
+      display: none;
+   }
+
    .lines__line--middle {
       border-top: 0;
    }
