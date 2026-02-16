@@ -54,42 +54,43 @@ export default class UI {
         };
         window.addEventListener('wheel', handleWheel, { passive: false });
 
-        // Mobile: one-finger vertical swipe anywhere = change room (capture phase so we run before canvas)
-        const TOUCH_THRESHOLD = 40;
-        let touchStartY = 0;
-        let touchLastY = 0;
-        let touchActive = false;
+        // Mobile: overlay that captures touch so swipe up/down changes room (sidebar/room-desc stay on top and still work)
+        const isTouchDevice = () => 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        if (isTouchDevice()) {
+            const TOUCH_THRESHOLD = 35;
+            let touchStartY = 0;
+            let touchActive = false;
 
-        const isTouchOnUI = (target) => {
-            return target && (target.closest('.sidebar') || target.closest('.room-desc'));
-        };
+            const overlay = document.createElement('div');
+            overlay.setAttribute('id', 'touch-swipe-overlay');
+            overlay.style.cssText = 'position:fixed;inset:0;z-index:0;touch-action:none;';
+            document.body.appendChild(overlay);
 
-        const handleTouchStart = (e) => {
-            if (e.touches.length !== 1 || isTouchOnUI(e.target)) return;
-            touchActive = true;
-            touchStartY = touchLastY = e.touches[0].clientY;
-        };
-        const handleTouchMove = (e) => {
-            if (!touchActive || e.touches.length !== 1) return;
-            e.preventDefault();
-            touchLastY = e.touches[0].clientY;
-        };
-        const handleTouchEnd = (e) => {
-            if (!touchActive) return;
-            touchActive = false;
-            const touch = e.changedTouches && e.changedTouches[0];
-            if (!touch) return;
-            const endY = touch.clientY;
-            const delta = touchStartY - endY;
-            if (Math.abs(delta) >= TOUCH_THRESHOLD) {
-                applyScroll(delta > 0 ? 1 : -1);
-            }
-        };
+            overlay.addEventListener('touchstart', (e) => {
+                if (e.touches.length !== 1) return;
+                touchActive = true;
+                touchStartY = e.touches[0].clientY;
+            }, { passive: true });
 
-        const capture = true;
-        document.addEventListener('touchstart', handleTouchStart, { passive: true, capture });
-        document.addEventListener('touchmove', handleTouchMove, { passive: false, capture });
-        document.addEventListener('touchend', handleTouchEnd, { passive: true, capture });
+            overlay.addEventListener('touchmove', (e) => {
+                if (!touchActive || e.touches.length !== 1) return;
+                e.preventDefault();
+            }, { passive: false });
+
+            overlay.addEventListener('touchend', (e) => {
+                if (!touchActive) return;
+                const touch = e.changedTouches && e.changedTouches[0];
+                if (!touch) {
+                    touchActive = false;
+                    return;
+                }
+                const delta = touchStartY - touch.clientY;
+                if (Math.abs(delta) >= TOUCH_THRESHOLD) {
+                    applyScroll(delta > 0 ? 1 : -1);
+                }
+                touchActive = false;
+            }, { passive: true });
+        }
     }
 
     /**
