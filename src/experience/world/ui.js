@@ -54,39 +54,35 @@ export default class UI {
         };
         window.addEventListener('wheel', handleWheel, { passive: false });
 
-        // Mobile: two-finger vertical swipe = change room (one-finger = camera orbit)
-        const TOUCH_THRESHOLD = 40;
-        let twoFingerStartY = 0;
-        let twoFingerLastY = 0;
-        let trackingTwoFinger = false;
+        // Mobile: one-finger swipe in bottom "scroll zone" = change room (rest of screen = camera)
+        const SCROLL_ZONE_HEIGHT = 72;
+        const TOUCH_THRESHOLD = 35;
+        let scrollZoneStartY = 0;
+        let scrollZoneActive = false;
 
-        const getTouchCenterY = (touches) => {
-            if (!touches.length) return 0;
-            let sum = 0;
-            for (let i = 0; i < touches.length; i++) sum += touches[i].clientY;
-            return sum / touches.length;
+        const isInScrollZone = (clientY) => {
+            return typeof window !== 'undefined' && clientY >= window.innerHeight - SCROLL_ZONE_HEIGHT;
         };
 
         const handleTouchStart = (e) => {
-            if (e.touches.length === 2) {
-                trackingTwoFinger = true;
-                twoFingerStartY = getTouchCenterY(e.touches);
-                twoFingerLastY = twoFingerStartY;
+            if (e.touches.length === 1 && isInScrollZone(e.touches[0].clientY)) {
+                scrollZoneActive = true;
+                scrollZoneStartY = e.touches[0].clientY;
             }
         };
         const handleTouchMove = (e) => {
-            if (trackingTwoFinger && e.touches.length === 2) {
+            if (scrollZoneActive && e.touches.length === 1) {
                 e.preventDefault();
-                twoFingerLastY = getTouchCenterY(e.touches);
             }
         };
         const handleTouchEnd = (e) => {
-            if (trackingTwoFinger && e.touches.length < 2) {
-                const delta = twoFingerStartY - twoFingerLastY;
+            if (scrollZoneActive && e.changedTouches && e.changedTouches[0]) {
+                const endY = e.changedTouches[0].clientY;
+                const delta = scrollZoneStartY - endY;
                 if (Math.abs(delta) >= TOUCH_THRESHOLD) {
                     applyScroll(delta > 0 ? 1 : -1);
                 }
-                trackingTwoFinger = false;
+                scrollZoneActive = false;
             }
         };
 
