@@ -382,9 +382,9 @@ body {
 
    .room-desc {
       width: auto;
-      max-width: calc(100vw - 155px);
+      max-width: calc(100vw - 200px);
       right: 12px;
-      top: 12px;
+      top: 4px;
       padding: 0;
    }
 
@@ -431,8 +431,9 @@ body {
 @media (max-width: 480px) {
    .room-desc {
       right: 10px;
-      max-width: calc(100vw - 130px);
+      max-width: calc(100vw - 200px);
       padding: 8px 0;
+      top: 4px;
    }
 
    .room-desc__box {
@@ -449,7 +450,7 @@ body {
 
    .sidebar__content {
       left: 10px;
-      top: 10px;
+      top: 12px;
       padding: 8px 6px;
    }
 
