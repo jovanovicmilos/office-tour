@@ -54,21 +54,44 @@ export default class UI {
         };
         window.addEventListener('wheel', handleWheel, { passive: false });
 
-        // Touch support for mobile: swipe up = next room, swipe down = previous
-        const TOUCH_THRESHOLD = 50;
-        let touchStartY = 0;
-        const handleTouchStart = (e) => {
-            touchStartY = e.touches[0].clientY;
+        // Mobile: two-finger vertical swipe = change room (one-finger = camera orbit)
+        const TOUCH_THRESHOLD = 40;
+        let twoFingerStartY = 0;
+        let twoFingerLastY = 0;
+        let trackingTwoFinger = false;
+
+        const getTouchCenterY = (touches) => {
+            if (!touches.length) return 0;
+            let sum = 0;
+            for (let i = 0; i < touches.length; i++) sum += touches[i].clientY;
+            return sum / touches.length;
         };
-        const handleTouchEnd = (e) => {
-            if (!e.changedTouches[0]) return;
-            const touchEndY = e.changedTouches[0].clientY;
-            const delta = touchStartY - touchEndY;
-            if (Math.abs(delta) >= TOUCH_THRESHOLD) {
-                applyScroll(delta > 0 ? 1 : -1);
+
+        const handleTouchStart = (e) => {
+            if (e.touches.length === 2) {
+                trackingTwoFinger = true;
+                twoFingerStartY = getTouchCenterY(e.touches);
+                twoFingerLastY = twoFingerStartY;
             }
         };
+        const handleTouchMove = (e) => {
+            if (trackingTwoFinger && e.touches.length === 2) {
+                e.preventDefault();
+                twoFingerLastY = getTouchCenterY(e.touches);
+            }
+        };
+        const handleTouchEnd = (e) => {
+            if (trackingTwoFinger && e.touches.length < 2) {
+                const delta = twoFingerStartY - twoFingerLastY;
+                if (Math.abs(delta) >= TOUCH_THRESHOLD) {
+                    applyScroll(delta > 0 ? 1 : -1);
+                }
+                trackingTwoFinger = false;
+            }
+        };
+
         window.addEventListener('touchstart', handleTouchStart, { passive: true });
+        window.addEventListener('touchmove', handleTouchMove, { passive: false });
         window.addEventListener('touchend', handleTouchEnd, { passive: true });
     }
 
