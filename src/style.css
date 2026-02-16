@@ -39,8 +39,9 @@ body {
 
 .loading-bar h1 {
    font-weight: 300;
-   letter-spacing: 0.15em;
+   letter-spacing: 0.10em;
    opacity: 0.95;
+   text-align: center;
 }
 
 .loading-bar__progress {
