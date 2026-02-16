@@ -29,6 +29,19 @@ export default class UI {
 
 
     setupScrollNavigation() {
+        const applyScroll = (direction) => {
+            if (this.scrollCooldown) return;
+            const index = this.getViewIndex(this.currentViewId);
+            const nextIndex = direction > 0
+                ? Math.min(index + 1, SCROLL_VIEW_ORDER.length - 1)
+                : Math.max(index - 1, 0);
+            if (nextIndex !== index) {
+                this.scrollCooldown = true;
+                this.switchView(SCROLL_VIEW_ORDER[nextIndex]);
+                setTimeout(() => { this.scrollCooldown = false; }, 1200);
+            }
+        };
+
         const handleWheel = (e) => {
             if (this.scrollCooldown) {
                 e.preventDefault();
@@ -37,20 +50,26 @@ export default class UI {
             }
             e.preventDefault();
             e.stopPropagation();
-            const index = this.getViewIndex(this.currentViewId);
-            let nextIndex;
-            if (e.deltaY > 0) {
-                nextIndex = Math.min(index + 1, SCROLL_VIEW_ORDER.length - 1);
-            } else {
-                nextIndex = Math.max(index - 1, 0);
-            }
-            if (nextIndex !== index) {
-                this.scrollCooldown = true;
-                this.switchView(SCROLL_VIEW_ORDER[nextIndex]);
-                setTimeout(() => { this.scrollCooldown = false; }, 1200);
-            }
+            applyScroll(e.deltaY > 0 ? 1 : -1);
         };
         window.addEventListener('wheel', handleWheel, { passive: false });
+
+        // Touch support for mobile: swipe up = next room, swipe down = previous
+        const TOUCH_THRESHOLD = 50;
+        let touchStartY = 0;
+        const handleTouchStart = (e) => {
+            touchStartY = e.touches[0].clientY;
+        };
+        const handleTouchEnd = (e) => {
+            if (!e.changedTouches[0]) return;
+            const touchEndY = e.changedTouches[0].clientY;
+            const delta = touchStartY - touchEndY;
+            if (Math.abs(delta) >= TOUCH_THRESHOLD) {
+                applyScroll(delta > 0 ? 1 : -1);
+            }
+        };
+        window.addEventListener('touchstart', handleTouchStart, { passive: true });
+        window.addEventListener('touchend', handleTouchEnd, { passive: true });
     }
 
     /**
