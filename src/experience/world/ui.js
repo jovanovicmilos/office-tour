@@ -54,16 +54,33 @@ export default class UI {
         };
         window.addEventListener('wheel', handleWheel, { passive: false });
 
-        // Mobile: overlay that captures touch so swipe up/down changes room (sidebar/room-desc stay on top and still work)
+        // Mobile: overlay in center strip captures touch – swipe up/down changes room (sidebar + room-desc stay clickable)
         const isTouchDevice = () => 'ontouchstart' in window || navigator.maxTouchPoints > 0;
         if (isTouchDevice()) {
-            const TOUCH_THRESHOLD = 35;
+            const TOUCH_THRESHOLD = 25;
             let touchStartY = 0;
             let touchActive = false;
 
             const overlay = document.createElement('div');
             overlay.setAttribute('id', 'touch-swipe-overlay');
-            overlay.style.cssText = 'position:fixed;inset:0;z-index:0;touch-action:none;';
+            // Center strip – left of sidebar, right of room-desc – so overlay is clearly on top
+            const setOverlayBounds = () => {
+                const w = window.innerWidth;
+                const right = w < 400 ? 20 : w < 768 ? 140 : 300;
+                overlay.style.cssText = [
+                    'position:fixed',
+                    'top:0',
+                    'bottom:0',
+                    'left:56px',
+                    `right:${right}px`,
+                    'z-index:5',
+                    'touch-action:none',
+                    'pointer-events:auto'
+                ].join(';') + ';';
+            };
+            setOverlayBounds();
+            window.addEventListener('resize', setOverlayBounds);
+            // Append at end so overlay is on top of canvas (Android often lets canvas eat touches if it's on top)
             document.body.appendChild(overlay);
 
             overlay.addEventListener('touchstart', (e) => {
